@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, useCallback } from 'react';
 import { FiChevronsRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
@@ -38,30 +38,31 @@ const Dashboard: React.FC = () => {
   }, [repositories]);
 
   // event: FormEvent<HTMLFormElement>  :   tipando o parametro "event" como do typo submit;
-  async function handleAddRepository(
-    event: FormEvent<HTMLFormElement>,
-  ): Promise<void> {
-    event.preventDefault();
-    if (!newRepo) {
-      setInputError('Digite o autor/nome do repositorio!');
-      return;
-    }
+  const handleAddRepository = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (!newRepo) {
+        setInputError('Digite o autor/nome do repositorio!');
+        return;
+      }
 
-    try {
-      // api.get<Repository>  :   definindo o retorno dessa api do tipo Repository;
-      const response = await api.get<Repository>(`repos/${newRepo}`);
+      try {
+        // api.get<Repository>  :   definindo o retorno dessa api do tipo Repository;
+        const response = await api.get<Repository>(`repos/${newRepo}`);
 
-      const repository = response.data;
+        const repository = response.data;
 
-      setRepositories([...repositories, repository]);
-      setNewRepo('');
-      setInputError('');
+        setRepositories([...repositories, repository]);
+        setNewRepo('');
+        setInputError('');
 
-      // console.log(response.data);
-    } catch (err) {
-      setInputError('Erro na busca por esse repositorio!');
-    }
-  }
+        // console.log(response.data);
+      } catch (err) {
+        setInputError('Erro na busca por esse repositorio!');
+      }
+    },
+    [newRepo, repositories],
+  );
 
   return (
     <>
